@@ -1,0 +1,40 @@
+{
+  "name": "cute.test",
+  "version": "1.0.0",
+  "description": "easy test tool for easy using",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "commander": "^8.1.0",
+    "cute.curl.core": "^1.1.0",
+    "dson.js": "^1.2.0",
+    "find": "^0.3.0",
+    "url-parse": "^1.5.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apporoad/cute.test.js.git"
+  },
+  "keywords": [
+    "api",
+    "test",
+    "unit",
+    "test"
+  ],
+  "author": "apporoad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apporoad/cute.test.js/issues"
+  },
+  "bin": {
+    "ctest": "bin.js",
+    "cutetest": "bin.js"
+  },
+  "homepage": "https://github.com/apporoad/cute.test.js#readme"
+}
