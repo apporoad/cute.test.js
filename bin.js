@@ -3,8 +3,8 @@
 const path = require('path')
 const fs = require('fs')
 const program = require('commander')
-var curl = require('./index')
 const find = require('find')
+const Fuse = require('fuse.js')
 
 program.version(require('./package.json').version)
     .usage(' [workdirOrFilePath]'
@@ -36,7 +36,6 @@ var list = async function(options){
 }
 
 var getCtestFiles =async function(dir){
-    
     return new Promise((r,j)=>{
         find.file(/ctest\.js$/, dir, function(ffs) {
             var files = []
@@ -58,12 +57,34 @@ var getFiles = async (pathes , baseDir)=>{
         var ap = path.resolve(baseDir , p)
         // console.log(ap)
         if(fs.existsSync(ap)){
+            //console.log(ap)
             if(fs.statSync(ap).isFile()){
                 files.push(ap)
             }else{
                 var ffs = await getCtestFiles(ap)
                files = files.concat(ffs)
             }
+        }else{
+            // 模糊匹配
+            var allFiles = await getCtestFiles(baseDir)
+            var toMatchFileNames = []
+            allFiles.forEach(f=>{
+                toMatchFileNames.push(path.relative(baseDir, f))
+            })
+            const  ops = {includeScore: true}
+            const fuse = new Fuse(toMatchFileNames, ops)
+            var rfs = fuse.search(p)
+            // console.log(rfs)
+            rfs.forEach(match=>{
+                if(p.length<=2){
+                    if(match.item.indexOf(p) > -1){
+                        files.push(path.join(baseDir , match.item))
+                    }
+                }else{
+                    files.push(path.join(baseDir , match.item))
+                }
+                
+            })
         }
     }
     return files.filter((v, i, a) => a.indexOf(v) === i)
@@ -71,7 +92,7 @@ var getFiles = async (pathes , baseDir)=>{
 
 var args = program.args
 
-// args = ["test", "index.d.ts"]
+// args = ["su"]
 
 var main = async ()=>{
     if(args.length == 0 ){
@@ -79,14 +100,17 @@ var main = async ()=>{
     }else{
         // console.log(program.args)
         var targetFiles = await getFiles(args ,process.cwd())
+
+        console.log(targetFiles)
         if(targetFiles.length==0){
             console.log('cannot find test file....')
             return 
         }
+
         var allFiles = await getFiles([options.workspace] , path.resolve(process.cwd(), options.workspace))
         allFiles = (targetFiles.concat(allFiles)).filter((v, i, a) => a.indexOf(v) === i)
 
-        console.log(targetFiles)
+        // console.log(targetFiles)
         console.log(allFiles)
     }
 }

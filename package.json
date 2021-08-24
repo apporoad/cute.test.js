@@ -11,6 +11,7 @@
     "cute.curl.core": "^1.1.0",
     "dson.js": "^1.2.0",
     "find": "^0.3.0",
+    "fuse.js": "^6.4.6",
     "url-parse": "^1.5.3"
   },
   "devDependencies": {},
