@@ -101,7 +101,7 @@ var main = async ()=>{
         // console.log(program.args)
         var targetFiles = await getFiles(args ,process.cwd())
 
-        console.log(targetFiles)
+        // console.log(targetFiles)
         if(targetFiles.length==0){
             console.log('cannot find test file....')
             return 
@@ -110,8 +110,9 @@ var main = async ()=>{
         var allFiles = await getFiles([options.workspace] , path.resolve(process.cwd(), options.workspace))
         allFiles = (targetFiles.concat(allFiles)).filter((v, i, a) => a.indexOf(v) === i)
 
-        // console.log(targetFiles)
+        console.log(targetFiles)
         console.log(allFiles)
+
     }
 }
 
