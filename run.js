@@ -1,3 +1,3 @@
-exports.run = async (targetApis , allApis)=>{
-
+exports.run = async (apis)=>{
+    
 }

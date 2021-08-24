@@ -5,6 +5,7 @@ const fs = require('fs')
 const program = require('commander')
 const find = require('find')
 const Fuse = require('fuse.js')
+const runner = require('./run')
 
 program.version(require('./package.json').version)
     .usage(' [workdirOrFilePath]'
@@ -92,7 +93,7 @@ var getFiles = async (pathes , baseDir)=>{
 
 var args = program.args
 
-// args = ["su"]
+args = ["su"]
 
 var main = async ()=>{
     if(args.length == 0 ){
@@ -110,9 +111,18 @@ var main = async ()=>{
         var allFiles = await getFiles([options.workspace] , path.resolve(process.cwd(), options.workspace))
         allFiles = (targetFiles.concat(allFiles)).filter((v, i, a) => a.indexOf(v) === i)
 
-        console.log(targetFiles)
-        console.log(allFiles)
+        // console.log(targetFiles)
+        // console.log(allFiles)
 
+        var apis = []
+        allFiles.forEach(tf =>{
+            var one  = require(tf)
+            one.meta = one.meta ||{}
+            one.meta.path = tf
+            one.meta.isTarget = targetFiles.indexOf(tf) > -1 
+            apis.push(one)
+        })
+        runner.run(apis)
     }
 }
 

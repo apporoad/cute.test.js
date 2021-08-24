@@ -399,8 +399,32 @@ declare class DSON {
 
 }
 
+
+declare class GContext {
+    // /**
+    //  * 调用API
+    //  * @param cmds 命令参数，用数组，或者不用数组，直接 ( a1,a2,a3) 方式调用
+    //  * @param options 参数，http头等扩展， 具体参考 cute.curl.core.js
+    //  */
+    // api(cmds , options ? : Object)
+
+    /**
+     * 跳转到全局锚点，如 jump('@markName')
+     * @param markName 锚点名
+     */
+    jump(markName : string) : DSON
+
+    /**
+     * 跳转到全局锚点，如 goto('@markName')
+     * @param markName 锚点名
+     */
+    goto(markName : string) : DSON
+}
+// GContext
+
 declare function JVD(experssion: string): JVD
 declare function DSON(experssion): DSON
+declare function GContext() : GContext
 
 export = {
     /**
@@ -412,10 +436,9 @@ export = {
      * JVD class
      */
     JVD: JVD,
-    
+
     /**
-     * 配置dson
-     * @param configs  配置对象
+     * Global context
      */
-    config(configs:Object)
+    GContext : GContext,
 }

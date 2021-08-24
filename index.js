@@ -5,6 +5,11 @@ var Url = require('url-parse');
 
 global.ctestExts = {}
 
+global.ctestConfig = global.ctestConfig  || {}
+
+//全局设置默认请求方法
+global.ctestConfig.defaultMethod = global.ctestConfig.defaultMethod || 'post'
+
 exports.exts = global.ctestExts
 
 //替换baseUrl
@@ -27,7 +32,7 @@ D.reg('api', async (...params) => {
     // context.currentData = context.tempData = `${context.tempData},hello ${yourParam1} ${yourParam2}`
 
     if(ps.length==0){
-        context.currentData = null
+        context.currentData = context.tempData = null
     }else{
         //参数模式
         if(ps[0] instanceof Array  && (ps.length == 0 || typeof ps[1] == 'object')){
@@ -43,18 +48,30 @@ D.reg('api', async (...params) => {
                     await defaultPreInvoke(invokeObj,context)
                 }
             }
+            options.defaultMethod = global.ctestConfig.defaultMethod
             context.currentData = context.tempData = await ccurl.invoke(ps[0] ,ps[1])
         }else{
             context.currentData = context.tempData = await ccurl.invoke(ps, {
                 preInvoke : async (invokeObj)=>{
                     await defaultPreInvoke(invokeObj,context)
-                }
+                },
+                defaultMethod : global.ctestConfig.defaultMethod
             })
         }
     }
 })
 
 
+
+function GContext (){}
+
+GContext.jump = GContext.goto = (markName)=>{
+    return D().goto(markName)
+}
+
+
 exports.DSON = D
 exports.JVD = JVD
+exports.GContext = GContext
+
 
