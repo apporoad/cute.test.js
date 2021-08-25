@@ -61,12 +61,14 @@ D.reg('api', async (...params) => {
     }
 })
 
-
+D.reg( 'module' , async()=>{})
 
 function GContext (){}
 
 GContext.jump = GContext.goto = (markName)=>{
-    return D().goto(markName)
+    var ad = D().goto(markName)
+    ad.isCtestInput = true
+    return ad
 }
 
 

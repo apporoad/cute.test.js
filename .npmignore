@@ -128,3 +128,5 @@ temp/
 test/
 
 test.js
+
+jestTest/

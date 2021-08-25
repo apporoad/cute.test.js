@@ -2,6 +2,8 @@ var SD = require('../index').DSON
 
 var sd = SD()
 
+sd.module('测试模块easy', '仅用于测试easy')
+
 sd.api(
     'http://localhost:20000/easy',
     {"name": "apporoad" , 'like' : ['LiSA'] , gender : '1' , Code : '0000'}

@@ -4,12 +4,19 @@ declare class JVD {
 }
 
 declare class DSON {
+
+    /**
+     * 模块描述
+     * @param name  模块名
+     * @param desc  说明
+     */
+    module(name : string , desc :string) : DSON
     /**
      * 调用API
      * @param cmds 命令参数，用数组，或者不用数组，直接 ( a1,a2,a3) 方式调用
      * @param options 参数，http头等扩展， 具体参考 cute.curl.core.js
      */
-    api(cmds , options ? : Object)
+    api(cmds , options ? : Object) : DSON
     /**
      * reg new method for this DSON object
      * 给该dson注册新方法

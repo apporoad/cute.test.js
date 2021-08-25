@@ -93,7 +93,7 @@ var getFiles = async (pathes , baseDir)=>{
 
 var args = program.args
 
-args = ["su"]
+// args = ["su"]
 
 var main = async ()=>{
     if(args.length == 0 ){

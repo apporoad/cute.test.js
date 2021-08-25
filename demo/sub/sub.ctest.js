@@ -4,6 +4,8 @@ var G = CTest.GContext.goto
 
 var sd = SD()
 
+sd.module("测试模块easy", "仅用于测试模块easy")
+
 sd.api(
     'http://localhost:20000/sub',
     {"like": G("@like") , Code : '0000'},
