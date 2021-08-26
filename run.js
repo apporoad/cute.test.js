@@ -1,6 +1,7 @@
 var ljson = require('lisa.json')
 var utils = require('lisa.utils')
 var GCH = require('lisa.gache.js')
+var fs = require('fs')
 
 
 var drawInputAndOutput = async function(apis){
@@ -92,14 +93,28 @@ var checkNoInputApis = function(apis,allVars){
 exports.checkNoInputApis = checkNoInputApis
 
 
-var ArrayContains = function(arr1, arr2){
-    for(var i =0;i<arr1.length;i++){
-        var one = arr1[i]
-        if(utils.ArrayContains(arr2, one)){
-            return true
+// var ArrayContains = function(arr1, arr2){
+//     for(var i =0;i<arr1.length;i++){
+//         var one = arr1[i]
+//         if(utils.ArrayContains(arr2, one)){
+//             return true
+//         }
+//     }
+//     return false
+// }
+
+var ArrayDistinct = function(arr){
+    var index = 0
+    while(index < arr.length){
+        var current = arr[index]
+
+        var index2 = arr.indexOf(current , index + 1)
+        if( index2> -1){
+            arr.splice(index2,1)
+        }else{
+            index ++
         }
     }
-    return false
 }
 var getSuitableApi = function(apis, need){
     var index = -1 
@@ -118,55 +133,74 @@ var getSuitableApi = function(apis, need){
 }
 
 /**
- * 过滤并重排要跑的接口
+ * 过滤并重排要跑的接口 （ps ， isTarget的 接口必须放前面）
  * @param {*} apis 
  * @param {*} allOutputs 
  * @param {*} needs 
  * @returns 
  */
 var filterAndReorderToRunApis = function(apis, allOutputs ,needs){
-    if(apis.length ==0){
-        return []
-    }
     var orderedApis = []
     needs = needs || []
     allOutputs = allOutputs || []
+
+    //空apis时特殊处理
+    if(apis.length ==0){
+        var tempNeeds = utils.ArrayRemove( needs , allOutputs)
+        if(tempNeeds.length>0){
+            throw new Error('CTEST: cannot resolve params : ' + tempNeeds.join(','))
+        }
+        return []
+    }
     needs = utils.ArrayRemove(needs, allOutputs)
     if(needs.length == 0){
-        var first = apis.pop()
+        var first = apis.shift()
         if(!first.meta.isTarget){
             return []
         }
         //找到为满足输入要求的需求
-        var tempNeeds = utils.ArrayRemove( first.meta.inputs || [] , alloutputs)
-        var newAllOutputs = []
+        var tempNeeds = utils.ArrayRemove( first.meta.inputs || [] , allOutputs)
         if(tempNeeds.length>0){
             orderedApis = filterAndReorderToRunApis(apis, allOutputs,tempNeeds).concat([first])
-            orderedApis.forEach(a=>{  newAllOutputs = newAllOutputs.concat(a.meta.outputs)})
-            newAllOutputs = utils.ArrayDistinct(newAllOutputs)
+            orderedApis.forEach(a=>{  
+                a.meta.outputs.forEach(oo=> {
+                    allOutputs.push(oo)
+                })
+            })
         }else{
             orderedApis.push(first)
-            newAllOutputs = allOutputs.concat(api.meta.outputs || [])
+            first.meta.outputs.forEach(oo=> {
+                allOutputs.push(oo)
+            })
         }
-        return orderedApis.concat(filterAndReorderToRunApis(apis,newAllOutputs ,null))
+        ArrayDistinct(allOutputs)
+        return orderedApis.concat(filterAndReorderToRunApis(apis,allOutputs ,null))
     }else{
-        var oneNeed = needs.pop()
-        var newAllOutputs = [].concat(allOutputs)
+        var oneNeed = needs.shift()
         while(oneNeed){
+            //如果已经满足跳过
+            if(utils.ArrayContains(allOutputs,oneNeed)){
+                oneNeed = needs.shift()
+                continue
+            }
             var api = getSuitableApi(apis,oneNeed)
             if(api){
-                var tempNeeds = utils.ArrayRemove( api.meta.inputs || [] , newAllOutputs)
+                var tempNeeds = utils.ArrayRemove( api.meta.inputs || [] , allOutputs)
                 if(tempNeeds.length>0){
-                    orderedApis = orderedApis.concat(filterAndReorderToRunApis(apis, newAllOutputs,tempNeeds)).concat([api])
+                    orderedApis = orderedApis.concat(filterAndReorderToRunApis(apis, allOutputs,tempNeeds)).concat([api])
                 }else{
                     orderedApis.push(api)
                 }
             }else{
-                new Error('cannot resolve param : ' + oneNeed)
+                throw new Error('CTEST: cannot resolve param : ' + oneNeed)
             }
-            orderedApis.forEach(a=>{  newAllOutputs = newAllOutputs.concat(a.meta.outputs)})
-            newAllOutputs = utils.ArrayDistinct(newAllOutputs)
-            oneNeed = needs.pop()
+            orderedApis.forEach(a=>{  
+                a.meta.outputs.forEach(oo=> {
+                    allOutputs.push(oo)
+                })
+            })
+            ArrayDistinct(allOutputs)
+            oneNeed = needs.shift()
         }
         return orderedApis
     }
@@ -174,7 +208,13 @@ var filterAndReorderToRunApis = function(apis, allOutputs ,needs){
 
 exports.filterAndReorderToRunApis = filterAndReorderToRunApis
 
-exports.run = async (apis, options)=>{
+/**
+ * 生成执行计划
+ * @param {*} apis  接口
+ * @param {*} options 
+ * @returns 
+ */
+exports.plan = async (apis, options)=>{
     options = options || {}
     //vars 参数列表
     options.vars = options.vars || {}
@@ -191,5 +231,36 @@ exports.run = async (apis, options)=>{
 
     //检查没有输入的接口，并提示
     var noInputApis = await checkNoInputApis(apis,allVars)
-    
+    if(noInputApis){
+        //todo
+        console.log('todo no input apis')
+        return
+    }
+
+    //接口重排
+    var reorderedApis = filterAndReorderToRunApis( apis, allVars)
+
+    return {
+        vars : allVars,
+        apis : reorderedApis
+    }
+}
+
+/**
+ * 生成执行计划文件
+ * @param {*} apis 
+ * @param {*} options 
+ * @param {*} path 
+ */
+exports.generatePlanFile = async (apis, options , path) => {
+    var plan = await exports.plan(apis, options)
+    var thinPlan = {}
+    thinPlan.vars = plan.vars
+    thinPlan.apis = []
+    plan.apis.forEach(one =>{
+        thinPlan.apis.push({
+            meta : one.meta
+        })
+    })
+    fs.writeFileSync(path , JSON.stringify(thinPlan))
 }

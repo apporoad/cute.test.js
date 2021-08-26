@@ -17,7 +17,7 @@ sd.test({
     "Code" : "='0000'",
     "like" : "!!"
 })
-sd.goto('apiResponse')
+sd.goto('apiResponse').mark('@abc')
 // 导出参数
 
 

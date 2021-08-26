@@ -52,7 +52,7 @@ it('test checkNoInputApis', async () => {
     }
     var all =  await run.checkNoInputApis(apis ,allVars)
 
-	console.log(all.length)
+	// console.log(all.length)
 
     expect(all.length).toBe(1)
     if(all.length>0){

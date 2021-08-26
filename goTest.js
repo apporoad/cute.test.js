@@ -1,7 +1,7 @@
 
 it = (title, fn) => {
-    if (fn)
-      fn()
+    // if (fn)
+    //   fn()
   }
   expect = (result) => {
     //console.log(result)
@@ -18,4 +18,5 @@ it = (title, fn) => {
   
   global.debug = global.debug || it2
 
-  require('./jestTest/test')
+  require('./jestTest/1.test')
+  require('./jestTest/2.test')

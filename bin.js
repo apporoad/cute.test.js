@@ -117,7 +117,7 @@ var main = async ()=>{
         var apis = []
         allFiles.forEach(tf =>{
             var one  = require(tf)
-            one.meta = one.meta ||{}
+            one.meta = one.meta || {}
             one.meta.path = tf
             one.meta.isTarget = targetFiles.indexOf(tf) > -1 
             apis.push(one)
