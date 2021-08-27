@@ -275,22 +275,24 @@ exports.generatePlanFile = async (apis, options , path) => {
 }
 
 
-const { exec } = require('child_process');
 exports.exec = async(planPath) =>{
     var testFile = Path.join(__dirname , "testEngineAdapters/").replace(/\\/g,'/')
-    console.log(testFile)
-    var ctestPorcess = exec('set ctestPlan="' + planPath +'" && jest ' + testFile, { cwd: process.cwd() }, (err, stdout, stderr) => {
-        if(err) {
-            console.log(err);
-            return;
-        }
-        // console.log(`stdout: ${stdout}`);
-    });
+    // console.log(testFile)
+    // var ctestPorcess = exec('set ctestPlan="' + planPath +'" && jest ' + testFile, { cwd: process.cwd() }, (err, stdout, stderr) => {
+    //     if(err) {
+    //         console.log(err);
+    //         return;
+    //     }
+    //     // console.log(`stdout: ${stdout}`);
+    // });
 
-    ctestPorcess.stdout.on('data', function (data) {
-        console.log(data);
-    })
-    ctestPorcess.stderr.on('data', function (data) {
-        console.log(data);
-    })
+    // ctestPorcess.stdout.on('data', function (data) {
+    //     console.log(data);
+    // })
+    // ctestPorcess.stderr.on('data', function (data) {
+    //     console.log(data);
+    // })
+
+    var spawn = require('child_process').spawn
+    spawn('cmd', ['/s', '/c', 'set ctestPlan="' + planPath +'" && jest ' + testFile] , {stdio: "inherit"} );
 }

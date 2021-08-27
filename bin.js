@@ -133,7 +133,7 @@ var getFiles = async (pathes , baseDir)=>{
 
 var args = program.args
 
-// args = ["su"]
+args = ["demo"]
 
 var main = async ()=>{
 
