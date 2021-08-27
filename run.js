@@ -2,6 +2,7 @@ var ljson = require('lisa.json')
 var utils = require('lisa.utils')
 var GCH = require('lisa.gache.js')
 var fs = require('fs')
+var Path = require('path')
 
 
 var drawInputAndOutput = async function(apis){
@@ -231,14 +232,14 @@ exports.plan = async (apis, options)=>{
 
     //检查没有输入的接口，并提示
     var noInputApis = await checkNoInputApis(apis,allVars)
-    if(noInputApis){
+    if(noInputApis && noInputApis.length >0 ){
         //todo
         console.log('todo no input apis')
         return
     }
 
     //接口重排
-    var reorderedApis = filterAndReorderToRunApis( apis, allVars)
+    var reorderedApis = filterAndReorderToRunApis( apis, Object.keys(allVars))
 
     return {
         vars : allVars,
@@ -253,7 +254,11 @@ exports.plan = async (apis, options)=>{
  * @param {*} path 
  */
 exports.generatePlanFile = async (apis, options , path) => {
+    options = options || {}
+    
     var plan = await exports.plan(apis, options)
+    if(!plan)
+        return false
     var thinPlan = {}
     thinPlan.vars = plan.vars
     thinPlan.apis = []
@@ -263,4 +268,29 @@ exports.generatePlanFile = async (apis, options , path) => {
         })
     })
     fs.writeFileSync(path , JSON.stringify(thinPlan))
+    if(options.verbose){
+        console.log('CTest :  generatePlanFile :' + path)
+    }
+    return true
+}
+
+
+const { exec } = require('child_process');
+exports.exec = async(planPath) =>{
+    var testFile = Path.join(__dirname , "testEngineAdapters/").replace(/\\/g,'/')
+    console.log(testFile)
+    var ctestPorcess = exec('set ctestPlan="' + planPath +'" && jest ' + testFile, { cwd: process.cwd() }, (err, stdout, stderr) => {
+        if(err) {
+            console.log(err);
+            return;
+        }
+        // console.log(`stdout: ${stdout}`);
+    });
+
+    ctestPorcess.stdout.on('data', function (data) {
+        console.log(data);
+    })
+    ctestPorcess.stderr.on('data', function (data) {
+        console.log(data);
+    })
 }
