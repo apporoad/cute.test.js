@@ -29,6 +29,7 @@ const optionsOut = program.opts();
 var options = {}
 options.workspace = path.resolve(process.cwd() ,optionsOut.workspace || '.')
 options.host = optionsOut.host
+options.verbose = optionsOut.verbose
 
 var dir = path.join(os.tmpdir() , 'ctest')
 if(!fs.existsSync(dir)){
@@ -133,7 +134,7 @@ var getFiles = async (pathes , baseDir)=>{
 
 var args = program.args
 
-args = ["demo"]
+// args = ["demo"]
 
 var main = async ()=>{
 
@@ -183,7 +184,7 @@ var main = async ()=>{
             var success = await runner.generatePlanFile(apis, options , planPath)
             //执行
             if(success){
-                runner.exec(planPath)
+                runner.exec(planPath ,options)
             }
             
         }

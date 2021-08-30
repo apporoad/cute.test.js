@@ -49,13 +49,16 @@ D.reg('api', async (...params) => {
                 }
             }
             options.defaultMethod = global.ctestConfig.defaultMethod
+            options.slient = options.silent = true
             context.currentData = context.tempData = await ccurl.invoke(ps[0] ,ps[1])
         }else{
             context.currentData = context.tempData = await ccurl.invoke(ps, {
                 preInvoke : async (invokeObj)=>{
                     await defaultPreInvoke(invokeObj,context)
                 },
-                defaultMethod : global.ctestConfig.defaultMethod
+                defaultMethod : global.ctestConfig.defaultMethod,
+                slient : true,
+                silent : true
             })
         }
     }

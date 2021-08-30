@@ -8,10 +8,11 @@
             "type": "pwa-node",
             "request": "launch",
             "name": "Launch Program",
+            // "env": { "ctestPlan" : "C:\\Users\\DEVELO~1\\AppData\\Local\\Temp\\ctest\\1630295255871.ctest.json"},
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\bin.js"
+            "program": "${workspaceFolder}\\goTestEngine.js"
         }
     ]
 }

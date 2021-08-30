@@ -8,15 +8,17 @@ sd.module("测试模块easy", "仅用于测试模块easy")
 
 sd.api(
     'http://localhost:20000/sub',
-    {"like": G("@like") , Code : '0000'},
+    {"like": G("@like"), Code : '0000'},
 )
 
 sd.mark('apiResponse')
 //here to test
+
 sd.test({
     "Code" : "='0000'",
     "like" : "!!"
-})
+}, '验证实体结构2')
+// .print()
 sd.goto('apiResponse').mark('@abc')
 // 导出参数
 

@@ -1,16 +1,26 @@
-const os = require('os')
-const path = require('path')
+// const os = require('os')
+// const path = require('path')
+const fs = require('fs')
+const utils = require('lisa.utils')
+const jestA = require('./jestAdapter')
 
-
-// console.log(process.env.ctestPlan)
-
-describe('common', function () {
-    it('GetCustomerIndexInfo访问', async () => {
-        
-        expect(true).toBe(true)
-    },50000);
-})
-
-var main = ()=>{
-    
+var main = async ()=>{
+    var ctestPlanPath = process.env.ctestPlan
+    if(!ctestPlanPath){
+        console.log('CTest runner :  cannot load Ctest path ， please set ENV : ctestPlan')
+        return
+    }
+    ctestPlanPath = utils.startTrim(utils.endTrim(ctestPlanPath))
+    if(!fs.existsSync(ctestPlanPath)){
+        console.log('CTest runner :  cannot load Ctest plan file :' + ctestPlanPath)
+        return
+    }
+    var ctestPlan = require(ctestPlanPath)
+    ctestPlan.options = ctestPlan.options || {}
+    // console.log(JSON.stringify(ctestPlan))
+    jestA.exec(ctestPlan)
 }
+
+main()
+
+

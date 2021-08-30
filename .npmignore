@@ -130,3 +130,7 @@ test/
 test.js
 
 jestTest/
+
+goTest.js
+
+goTestEngine.js

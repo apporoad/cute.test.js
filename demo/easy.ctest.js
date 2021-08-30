@@ -1,4 +1,7 @@
-var SD = require('../index').DSON
+var CTest = require('../index')
+var SD = CTest.DSON
+var G = CTest.GContext.goto
+
 
 var sd = SD()
 
@@ -10,11 +13,13 @@ sd.api(
 )
 
 sd.mark('apiResponse')
+sd.get('params')
+// .print()
 //here to test
 sd.test({
     "Code" : "='0000'",
     "like" : "!!"
-})
+} , '验证实体结构')
 sd.goto('apiResponse')
 // 导出参数
 sd.find('like').first().mark('@like')

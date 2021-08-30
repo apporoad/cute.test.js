@@ -275,7 +275,8 @@ exports.generatePlanFile = async (apis, options , path) => {
 }
 
 
-exports.exec = async(planPath) =>{
+exports.exec = async(planPath ,options) =>{
+    options = options || {}
     var testFile = Path.join(__dirname , "testEngineAdapters/").replace(/\\/g,'/')
     // console.log(testFile)
     // var ctestPorcess = exec('set ctestPlan="' + planPath +'" && jest ' + testFile, { cwd: process.cwd() }, (err, stdout, stderr) => {
@@ -293,6 +294,10 @@ exports.exec = async(planPath) =>{
     //     console.log(data);
     // })
 
+    if(options.verbose){
+        console.log('CTest: exec ctestPlan : ' + planPath)
+    }
+    planPath = planPath.replace(/\\/g , '/')
     var spawn = require('child_process').spawn
-    spawn('cmd', ['/s', '/c', 'set ctestPlan="' + planPath +'" && jest ' + testFile] , {stdio: "inherit"} );
+    spawn('cmd', ['/s', '/c', 'set ctestPlan=' + planPath +' && jest ' + testFile] , {stdio: "inherit"} );
 }
