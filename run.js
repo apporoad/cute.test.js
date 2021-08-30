@@ -3,6 +3,7 @@ var utils = require('lisa.utils')
 var GCH = require('lisa.gache.js')
 var fs = require('fs')
 var Path = require('path')
+const path = require('path')
 
 
 var drawInputAndOutput = async function(apis){
@@ -277,7 +278,7 @@ exports.generatePlanFile = async (apis, options , path) => {
 
 exports.exec = async(planPath ,options) =>{
     options = options || {}
-    var testFile = Path.join(__dirname , "testEngineAdapters/").replace(/\\/g,'/')
+    var testFile = Path.join(__dirname , "testEngineAdapters/test.js").replace(/\\/g,'/')
     // console.log(testFile)
     // var ctestPorcess = exec('set ctestPlan="' + planPath +'" && jest ' + testFile, { cwd: process.cwd() }, (err, stdout, stderr) => {
     //     if(err) {
@@ -298,6 +299,7 @@ exports.exec = async(planPath ,options) =>{
         console.log('CTest: exec ctestPlan : ' + planPath)
     }
     planPath = planPath.replace(/\\/g , '/')
+    var configPath = path.join(__dirname , 'testEngineAdapters/jest-config.js').replace(/\\/g , '/')
     var spawn = require('child_process').spawn
-    spawn('cmd', ['/s', '/c', 'set ctestPlan=' + planPath +' && jest ' + testFile] , {stdio: "inherit"} );
+    spawn('cmd', ['/s', '/c', 'set ctestPlan=' + planPath +' && jest ' + testFile + ' --config "' + configPath + '"'] , {stdio: "inherit"} );
 }

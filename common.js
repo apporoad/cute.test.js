@@ -13,8 +13,8 @@ global.ctestInit = global.ctestInit ||
         var currentDir = __dirname
         while(true){
             if(iJudgeDir(currentDir)){
-                // console.log(currentDir)
-                module.paths.push(path.join(currentDir , 'node_modules'))
+                // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' + currentDir)
+                module.paths.push(path.join(currentDir , 'node_modules').replace(/\\/g , '/'))
             }
             if(currentDir == path.dirname(currentDir)){
                 break
@@ -23,3 +23,5 @@ global.ctestInit = global.ctestInit ||
         }
     }
 }
+
+global.CTest =  global.CTest || require('./')

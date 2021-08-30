@@ -2,14 +2,14 @@
 // const path = require('path')
 
 require('../common')
-const fs = require('fs')
-const utils = require('lisa.utils')
-const jestA = require('./jestAdapter')
-const path = require('path')
-
 
 
 var main = async ()=>{
+    const fs = require('fs')
+    const utils = require('lisa.utils')
+    const jestA = require('./jestAdapter')
+    const path = require('path')
+
     var ctestPlanPath = process.env.ctestPlan
     if(!ctestPlanPath){
         console.log('CTest runner :  cannot load Ctest path ， please set ENV : ctestPlan')

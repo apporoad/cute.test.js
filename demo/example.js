@@ -1,13 +1,13 @@
 
 global.ctestInit ? global.ctestInit(module) : null //实现自动加载主要模块
-var CTest = require('cute.test.js')
+var CTest =  global.CTest || require('cute.test.js')
 var SD = CTest.DSON
 var G = CTest.GContext.goto
 
 
 var sd = SD()
 
-sd.module('测试模块easy', '仅用于测试easy')
+sd.module('测试模块example', 'test')
 
 sd.api(
     'http://localhost:20000/easy',
