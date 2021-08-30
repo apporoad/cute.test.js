@@ -1,5 +1,7 @@
 #! /usr/bin/env node
 
+require('./common')
+
 const path = require('path')
 const fs = require('fs')
 const program = require('commander')
@@ -7,6 +9,7 @@ const find = require('find')
 const Fuse = require('fuse.js')
 const runner = require('./run')
 const os = require('os')
+const utils = require('lisa.utils')
 
 
 program.version(require('./package.json').version)
@@ -23,6 +26,7 @@ program.version(require('./package.json').version)
     .option('-p --plan [plan]', '生成执行计划，默认会生成到os临时目录 ：  abc =>  tmpdir/ctest/abc.ctest.json   ./abc => 当前目录下abc.ctest.json  , 当然也支持绝对路径')
     .option('-H --host [host]', '访问接口需要替换的host  如： "http://www.lxixsxa.com/"')
     .option('-x --execute [execute]' , '执行执行计划')
+    .option('-n --new [new]' , '创建模板')
     .parse(process.argv)
 
 const optionsOut = program.opts();
@@ -30,6 +34,7 @@ var options = {}
 options.workspace = path.resolve(process.cwd() ,optionsOut.workspace || '.')
 options.host = optionsOut.host
 options.verbose = optionsOut.verbose
+options.new = optionsOut.new
 
 var dir = path.join(os.tmpdir() , 'ctest')
 if(!fs.existsSync(dir)){
@@ -97,13 +102,14 @@ var getFiles = async (pathes , baseDir)=>{
     for(var i =0;i<pathes.length;i++){
         var p = pathes[i]
         var ap = path.resolve(baseDir , p)
-        // console.log(ap)
+        //console.log(ap)
         if(fs.existsSync(ap)){
             //console.log(ap)
             if(fs.statSync(ap).isFile()){
                 files.push(ap)
             }else{
                 var ffs = await getCtestFiles(ap)
+                // console.log(ap)
                files = files.concat(ffs)
             }
         }else{
@@ -137,6 +143,21 @@ var args = program.args
 // args = ["demo"]
 
 var main = async ()=>{
+    if(options.new){
+        var newFile = null
+        if(utils.endWith(options.new , '.ctest.js')){
+            newFile = path.resolve(process.cwd(), options.new)
+        }else{
+            newFile = path.resolve(process.cwd(), options.new + '.ctest.js')
+        }
+        if(fs.existsSync(newFile)){
+            console.log('Ctest : file already exists : ' + newFile)
+            return
+        }
+        fs.copyFileSync(path.join(__dirname,'demo/example.js') , newFile)
+        console.log('new file : ' + newFile)
+        return 
+    }
 
     if(options.execute){
         if(fs.existsSync(options.execute)){

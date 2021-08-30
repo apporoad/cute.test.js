@@ -1,8 +1,13 @@
 // const os = require('os')
 // const path = require('path')
+
+require('../common')
 const fs = require('fs')
 const utils = require('lisa.utils')
 const jestA = require('./jestAdapter')
+const path = require('path')
+
+
 
 var main = async ()=>{
     var ctestPlanPath = process.env.ctestPlan
