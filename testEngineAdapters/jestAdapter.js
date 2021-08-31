@@ -6,14 +6,15 @@ var utils = require('lisa.utils')
 exports.exec = async(ctestPlan) =>{
     ctestPlan = ctestPlan || {}
     ctestPlan.options = ctestPlan.options || {}
+    if(ctestPlan.options.verbose){
+        global.ctestConfig = global.ctestConfig || {}
+        global.ctestConfig.verbose = true
+    }
+
     if(ctestPlan.options.ext){
         require(ctestPlan.options.ext)
     }
-    var dsonOptions = {
-        context : {
-            marks : null
-        }
-    }
+    
     /* {"vars":{},"apis":[{"meta":{"path":"D:\\lxy\\cute.test.js\\demo\\easy.ctest.js","isTarget":true,"name":"测试模块easy","desc":"仅用于测试easy","inputs":[],"outputs":["@like"]}},
     {"meta":{"path":"D:\\lxy\\cute.test.js\\demo\\sub\\sub.ctest.js","isTarget":true,"name":"测试模块easy","desc":"仅用于测试模块easy","inputs":["@like"],"outputs":["@abc"]}}]}*/
     if(ctestPlan.apis && ctestPlan.apis.length> 0){
@@ -25,6 +26,11 @@ exports.exec = async(ctestPlan) =>{
                     it(api.meta.desc || 'default desc', async () => {
                         var tempDsonOptions = { context : { marks :  Object.assign({} ,globalMarks)}}
                         var context = await dson.do({}, tempDsonOptions)
+                        if(ctestPlan.options.verbose){
+                            if(context.autoMarks && context.autoMarks['api']){
+                                console.log('Ctest jest : api invoke result : ' + JSON.stringify(context.autoMarks['api']))
+                            }
+                        }
                         if(api.meta.isTarget){
                             var result = null
                             var c = context

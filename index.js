@@ -10,12 +10,18 @@ global.ctestConfig = global.ctestConfig  || {}
 //全局设置默认请求方法
 global.ctestConfig.defaultMethod = global.ctestConfig.defaultMethod || 'post'
 
+global.ctestConfig.verbose = global.ctestConfig.verbose ||  false
+
 exports.exts = global.ctestExts
 
 global.ctestExts.apiPreInvokes = global.ctestExts.apiPreInvokes  || []
 
 //替换baseUrl
 var defaultPreInvoke = async (invokeObj,context) =>{
+    //todo 添加dson处理
+    if(global.ctestConfig.verbose && invokeObj){
+        console.log('Ctest : url : [' + invokeObj.method +']: ' + invokeObj.url + '\r\ndata : ' + (invokeObj.data ? JSON.stringify(invokeObj.data) : '') )
+    }
     if(context.marks && context.marks.baseUrl){
         var originUrl = Url(invokeObj.url)
         var baseUrl = Url(context.marks.baseUrl)
