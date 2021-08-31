@@ -11,7 +11,7 @@ sd.api(
     'http://localhost:20000/easy',
     {"name": "apporoad" , 'like' : ['LiSA'] , gender : '1' , Code : '0000'}
 )
-
+// sd.$login()
 sd.mark('apiResponse')
 sd.get('params')
 // .print()

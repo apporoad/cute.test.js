@@ -220,17 +220,20 @@ exports.plan = async (apis, options)=>{
     options = options || {}
     //vars 参数列表
     options.vars = options.vars || {}
-    options.cacheTime = options.cacheTime || options.timeout || null
+    options.cacheTime = options.cacheTime || options.cache || null
     //抽取输入输出
     await drawInputAndOutput(apis)
 
     //获取所有预有参数
     var cacheVars = {} 
     if(options.cacheTime){
-        cacheVars = GCH('ctest.json').getAll({timeout : options.cacheTime})
+        cacheVars = await GCH('ctest.json').getAll({timeout : options.cacheTime})
     }
     var allVars = Object.assign({},cacheVars,options.vars)
 
+    if(options.verbose){
+        console.log('CTest runner : load cache data :'  + JSON.stringify(cacheVars))
+    }
     //检查没有输入的接口，并提示
     var noInputApis = await checkNoInputApis(apis,allVars)
     if(noInputApis && noInputApis.length >0 ){
@@ -239,6 +242,7 @@ exports.plan = async (apis, options)=>{
         return
     }
 
+    // console.log(apis.length + 'aaaaaaaaaaa')
     //接口重排
     var reorderedApis = filterAndReorderToRunApis( apis, Object.keys(allVars))
 
@@ -256,12 +260,15 @@ exports.plan = async (apis, options)=>{
  */
 exports.generatePlanFile = async (apis, options , path) => {
     options = options || {}
-    
     var plan = await exports.plan(apis, options)
     if(!plan)
         return false
     var thinPlan = {}
     thinPlan.vars = plan.vars
+    // baseUrl
+    thinPlan.vars.baseUrl = thinPlan.vars.baseUrl || options.baseUrl || null
+
+    thinPlan.options = options
     thinPlan.apis = []
     plan.apis.forEach(one =>{
         thinPlan.apis.push({
@@ -270,6 +277,7 @@ exports.generatePlanFile = async (apis, options , path) => {
     })
     fs.writeFileSync(path , JSON.stringify(thinPlan))
     if(options.verbose){
+        console.log('CTest : plan content :' + JSON.stringify(thinPlan))
         console.log('CTest :  generatePlanFile :' + path)
     }
     return true

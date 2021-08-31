@@ -12,6 +12,8 @@ global.ctestConfig.defaultMethod = global.ctestConfig.defaultMethod || 'post'
 
 exports.exts = global.ctestExts
 
+global.ctestExts.apiPreInvokes = global.ctestExts.apiPreInvokes  || []
+
 //替换baseUrl
 var defaultPreInvoke = async (invokeObj,context) =>{
     if(context.marks && context.marks.baseUrl){
@@ -42,10 +44,22 @@ D.reg('api', async (...params) => {
                 options.preInvoke = async (invokeObj)=>{
                     await defaultPreInvoke(invokeObj,context)
                     await tempInvoke(invokeObj,context)
+                    for(var i =0;i<global.ctestExts.apiPreInvokes.length ;i++){
+                        var fn = global.ctestExts.apiPreInvokes[i]
+                        if(fn){
+                            await fn(invokeObj, context)
+                        }
+                    }
                 }
             }else{
                 options.preInvoke =  async (invokeObj)=>{
                     await defaultPreInvoke(invokeObj,context)
+                    for(var i =0;i<global.ctestExts.apiPreInvokes.length ;i++){
+                        var fn = global.ctestExts.apiPreInvokes[i]
+                        if(fn){
+                            await fn(invokeObj, context)
+                        }
+                    }
                 }
             }
             options.defaultMethod = global.ctestConfig.defaultMethod
@@ -55,6 +69,12 @@ D.reg('api', async (...params) => {
             context.currentData = context.tempData = await ccurl.invoke(ps, {
                 preInvoke : async (invokeObj)=>{
                     await defaultPreInvoke(invokeObj,context)
+                    for(var i =0;i<global.ctestExts.apiPreInvokes.length ;i++){
+                        var fn = global.ctestExts.apiPreInvokes[i]
+                        if(fn){
+                            await fn(invokeObj, context)
+                        }
+                    }
                 },
                 defaultMethod : global.ctestConfig.defaultMethod,
                 slient : true,

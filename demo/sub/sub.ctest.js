@@ -4,7 +4,7 @@ var G = CTest.GContext.goto
 
 var sd = SD()
 
-sd.module("测试模块easy", "仅用于测试模块easy")
+sd.module("测试模块sub", "仅用于测试模块sub")
 
 sd.api(
     'http://localhost:20000/sub',
@@ -12,6 +12,7 @@ sd.api(
 )
 
 sd.mark('apiResponse')
+sd.get('params')
 //here to test
 
 sd.test({

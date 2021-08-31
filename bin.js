@@ -16,8 +16,8 @@ program.version(require('./package.json').version)
     .usage(' [workdirOrFilePath]'
     + '\r\n [file] [file] [file]')
     .option('-U --baseUrl [baseUrl]','你访问的站点目录，如： http://localhost:8000/')
-    .option('-e --encoding [encoding]' , ' encoding of your file ,default is utf8')
-    .option('-o --output [output]', '输出文件')
+    // .option('-e --encoding [encoding]' , ' encoding of your file ,default is utf8')
+    // .option('-o --output [output]', '输出文件')
     
     .option('-c --config' , '配置文件')
 
@@ -27,6 +27,9 @@ program.version(require('./package.json').version)
     .option('-H --host [host]', '访问接口需要替换的host  如： "http://www.lxixsxa.com/"')
     .option('-x --execute [execute]' , '执行执行计划')
     .option('-n --new [new]' , '创建模板')
+    .option('-e --ext [ext]', '扩展js路径,默认加载工作目录下ctest.exts.js文件')
+    .option('-t --timeout <timout>' , '接口调用超时时间，默认10000（10秒）', parseInt)
+    .option('-a --cache <cache>' , '数据缓存时间，当设置时，优先加载缓存变量' , parseInt)
     .parse(process.argv)
 
 const optionsOut = program.opts();
@@ -35,6 +38,25 @@ options.workspace = path.resolve(process.cwd() ,optionsOut.workspace || '.')
 options.host = optionsOut.host
 options.verbose = optionsOut.verbose
 options.new = optionsOut.new
+options.baseUrl = optionsOut.baseUrl
+options.ext = optionsOut.ext
+options.timeout = optionsOut.timeout
+options.cache = options.cacheTime = optionsOut.cache
+
+if(options.ext){
+    var realPath = path.resolve(options.workspace ,options.ext)
+    if(fs.existsSync(realPath)){
+        options.ext = realPath
+    }else{
+        options.ext = null
+    }
+}
+if(!options.ext){
+    var realPath = path.resolve(options.workspace , 'ctest.exts.js')
+    if(fs.existsSync(realPath)){
+        options.ext = realPath
+    }
+}
 
 var dir = path.join(os.tmpdir() , 'ctest')
 if(!fs.existsSync(dir)){
@@ -122,6 +144,7 @@ var getFiles = async (pathes , baseDir)=>{
             const  ops = {includeScore: true}
             const fuse = new Fuse(toMatchFileNames, ops)
             var rfs = fuse.search(p)
+            // console.log('pppppppppp:' + p)
             // console.log(rfs)
             rfs.forEach(match=>{
                 if(p.length<=2){
@@ -129,7 +152,11 @@ var getFiles = async (pathes , baseDir)=>{
                         files.push(path.join(baseDir , match.item))
                     }
                 }else{
-                    files.push(path.join(baseDir , match.item))
+                    // 不使用模糊匹配
+                    if(match.item.indexOf(p) > -1){
+                        files.push(path.join(baseDir , match.item))
+                    }
+                    // files.push(path.join(baseDir , match.item))
                 }
                 
             })
@@ -186,6 +213,13 @@ var main = async ()=>{
 
         // console.log(targetFiles)
         // console.log(allFiles)
+
+        if(options.ext){
+            if(options.verbose){
+                console.log('CTest loading ext file : ' + options.ext)
+            }
+            require(options.ext)
+        }
 
         var apis = []
         allFiles.forEach(tf =>{
